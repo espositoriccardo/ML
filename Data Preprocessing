@@ -1,0 +1,27 @@
+/* Data Preprocessing */
+
+
+WITH one_year_sales AS (
+     SELECT DISTINCT
+           date,
+           (month(date)) AS month,
+           (year(date)) AS year,
+           customer,
+           sales
+      FROM sales
+     WHERE  date <= '30Nov2017'd
+)
+
+SELECT    month,
+          year,
+          customer,
+          (SUM(sales)) AS total_sales
+   FROM one_year_sales
+GROUP BY month,
+         year,
+         customer
+ORDER BY year,
+         month,
+         customer;
+         
+         
