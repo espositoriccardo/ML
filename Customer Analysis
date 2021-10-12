@@ -25,7 +25,7 @@ ORDER BY year,
          customer;
 
 
-/*/* Total Customers aggregate analysis */
+/*/* Total Customers analysis */
 /* Obtain aggregate data for total customers */
 
 CREATE TABLE total_customers_analysis AS
@@ -37,7 +37,7 @@ SELECT   year,
 GROUP BY year,
          month;
          
-/* Let's have a look at the customer distribution per months of activity */          
+/* Customer distribution per months of activity */          
 CREATE TABLE customer_distribution AS
      WITH dataset_with_count AS (
         SELECT DISTINCT 
@@ -56,10 +56,28 @@ SELECT months_of_activity,
    FROM customer_distribution
 GROUP BY customers_per_month_of_activity
 ORDER BY months_of_activity;
+
+/* Total customers overall activity */
+CREATE TABLE total_customers_overall_activity AS
+    WITH one_year_sales AS (
+         SELECT DISTINCT
+                   date,
+                   month(date) AS month,
+                   year(date) AS year,
+                   customer,
+                   sales
+            FROM sales
+         WHERE  date <= '30Nov2017'
+)
+SELECT customer,
+       COUNT(sales) AS overall_sales
+   FROM one_year_sales
+GROUP BY t1.customer
+ORDER BY COUNT_of_sales DESC;
          
 
-/*/* 3-month Customers aggregate analysis */*/
-/* First, create a list with all distinct customers whose overall activity is less than 4 months */
+/*/* 3-month Customers analysis */*/
+/* Create a master list with all distinct customers whose overall activity is less than 4 months */
 
 CREATE TABLE three_month_customers AS
      WITH dataset_with_count AS (
@@ -75,10 +93,10 @@ CREATE TABLE three_month_customers AS
                  month
      )
 SELECT DISTINCT customer
-   FROM three_month_customers
+   FROM dataset_with_count
 WHERE months_of_activity <= 3;
        
-/* Second, obtain aggregate data for 3-month customers */      
+/* Obtain aggregate data for 3-month customers */      
 CREATE TABLE three_month_customers_analysis AS
 SELECT   year,
          month,
@@ -87,5 +105,24 @@ SELECT   year,
    FROM  three_month_customers
 GROUP BY year,
          month;
+         
+/* 3-month customers overall activity */
+CREATE TABLE three_month_customers_overall_activity AS
+    WITH one_year_sales AS (
+         SELECT DISTINCT
+                   date,
+                   month(date) AS month,
+                   year(date) AS year,
+                   customer,
+                   sales
+            FROM sales
+         WHERE  date <= '30Nov2017'
+)
+SELECT customer,
+       COUNT(sales) AS overall_sales
+   FROM one_year_sales
+WHERE customer IN (SELECT DISTINCT customer FROM three_month_customers)
+GROUP BY t1.customer
+ORDER BY COUNT_of_sales DESC;
          
  
