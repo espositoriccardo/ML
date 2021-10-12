@@ -1,5 +1,5 @@
 /* Data Preprocessing */
-
+/* Generates a dataset with no duplicate values and 12-month data */
 
 WITH one_year_sales AS (
      SELECT DISTINCT
